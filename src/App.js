@@ -1,24 +1,65 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import { Row, Col, Button } from 'reactstrap';
+import { StyledContainer } from './App.styled';
 
-function App() {
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const mic = new SpeechRecognition();
+
+
+mic.continuous = true;
+mic.interimResults = true;
+mic.lang = 'en-US';
+
+
+
+const App = () => {
+  const [isListening, setIsListening] = useState(false);
+  const [note, setNote] = useState('');
+
+  useEffect(() => {
+    if (isListening) {
+      mic.start()
+      mic.onend = () => {
+        console.log('continue..')
+        mic.start()
+      }
+    } else {
+      mic.stop()
+      mic.onend = () => {
+        console.log('Stopped Mic on Click')
+      }
+    }
+    mic.onstart = () => {
+      console.log('Mics on')
+    }
+
+    mic.onresult = event => {
+      const transcript = Array.from(event.results)
+        .map(result => result[0])
+        .map(result => result.transcript)
+        .join('')
+      console.log(transcript)
+      setNote(transcript)
+      mic.onerror = event => {
+        console.log(event.error)
+      }
+    }
+  }, [isListening]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <StyledContainer>
+      <Row>
+        <Col md="6">
+          <h2>Current Speech</h2>
+          <br/>
+          <p>{note}</p>
+          <br/>
+          <Button 
+            onClick={()=> setIsListening(prevState => !prevState)}>Start/Stop</Button>
+        </Col>
+      </Row>
+    </StyledContainer>
   );
 }
 
