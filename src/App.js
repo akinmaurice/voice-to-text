@@ -47,6 +47,7 @@ const App = () => {
     }
   }, [isListening]);
 
+  const buttonText = isListening ? 'Stop': 'Start';
   return (
     <StyledContainer>
       <Row>
@@ -56,7 +57,7 @@ const App = () => {
           <p>{note}</p>
           <br/>
           <Button 
-            onClick={()=> setIsListening(prevState => !prevState)}>Start/Stop</Button>
+            onClick={()=> setIsListening(prevState => !prevState)}>{buttonText}</Button>
         </Col>
       </Row>
     </StyledContainer>
